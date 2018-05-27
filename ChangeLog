@@ -1,1 +1,51 @@
+## --------------------------------------------
+##
+## You have full permission to copy,
+## edit, and add features to wuzedroid
+## but you are not allowed to delete the auth tag.
+##
+## Author: wuseman
+## Edited: 2018/05/27
+##
+## ---------------------------------------------
+##
+# 1.9 Major features has been added:
+##
+++----------------------------------------------------------------------------------     
+++
+++     Connect to my device by wifi
+++     View wifi passwords stored on device"
+++     Show my Android version"
+++     Copy files from your computer to your phone"
+++     Copy files from your phone to your computer"
+++     Install application"
+++     Uninstall application from device"
+++     Update application already excist on my device"
+++     Make a call"
+++     Open default sms application on phone screen"
+++     Open default sms application on phone screen"
+++     Reset permissions"
+++     Emulate wm device"
+++     Reset wm to default"
+++     Print text"
+++     Screenshot"
+++     Screenrecord"
+++     Key Event"
+++     ShPref"
+++     Add a value to default shared preferences."
+++     Remove a value to default shared preferences."
+++     Clear all default shared preferences."
+++     Its also possible to specify shared preferences file."
+++     Data types"
+++     Restart application process after making changes"
+++     Restore a backup to your phone."
+++     Push and flash custom ROMs and zips from your computer."
+++     Check connection and get basic information about devices connected to the computer."
+++
+++----------------------------------------------------------------------------------
+##
 # 1.0 Beta has been released 2018/05/19
+##
+# Hope you will enjoy this new application
+# Time will determine how much I put down on this particular project.
+##!/end
