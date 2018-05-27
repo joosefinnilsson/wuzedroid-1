@@ -1,22 +1,24 @@
-sendit
+![alt text](https://sendit.nu/f/AK%3Ft9ui5j6_nvA.png)
+
+# Wuzedroid
 ==========
 
-Control your android phone from Linux easier then ever..
+Control your android phone from a linux terminal easier then ever..
 
-Requires: bash adb, fastboot
+Requires: a rooted phone for most things(few options works without root, will add this more in details in next update)
+and also bash, adb and fastboot is required.
 
 
-Usage
+# Usage
 -----
 
-
 ### To get started type:
-git clone https://github.com/wuseman/wuzedroid
-cd wuzroid-1.0_beta;
-chmod +x wuzedroid;
-./wuzedroid
+    git clone https://github.com/wuseman/wuzedroid
+    cd wuzroid-1.0_beta;
+    chmod +x wuzedroid;
+    ./wuzedroid
 
-License
+# License
 -------
 
 Copyright (c) 2018, wuseman
