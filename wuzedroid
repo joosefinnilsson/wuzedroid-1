@@ -1,16 +1,31 @@
 #!/bin/bash
 ############################################################################
-#### Copyright (C) 2018 wuseman <info@sendit.nu>
+#### You have full permission to copy,
+#### edit, and add features to wuzedroid
+#### but you are not allowed to delete the auth tag.
 ####
+#### Respect this simple rule and my little
+#### project will continue to develop at its own pace. ;)
+####
+#### Respect to all developers that contributes to
+#### open source projects. <3
+####
+#### Copyright (C) 2018 wuseman <info@sendit.nu>
+############################################################################
 #### Desc:    Control ADB from cli
 ####          tested on Gentoo
 #### Author:  wuseman
 #### Contact: info@sendit.nu
 ####
-#### This file is free software; as a special exception the author gives
-#### unlimited permission to copy and/or distribute it, with or without
-#### modifications, as long as this notice is preserved.
+#### This is a huge upgrade so please report bugs if there is any!
+####
 #############################################################################
+
+## --------------------------------------------
+##
+## Begin
+##
+## ---------------------------------------------
 
 r='\e[1;34m'
 g='\e[1;32m'
@@ -25,17 +40,24 @@ reset=`tput sgr0`
 RED=''
 NC='\033[0m' # No Color
 
+CFG_FILE="/etc/wuzedroid/wuzedroid.conf"
+CONTACTS="/etc/wuzedroid/contacts_for_adb.txt"
+
 if [[ $EUID -ne 0 ]]; then
   echo -e "\nYou must be Administrator to run this script\n" 2>&1
   exit 1
 else
 
-# Gentoo 
-# Todo: Add more later but since we develop on 
-# a gentoo machine lets stay here for now..
-if ! [ -x "$(command -v adb)" ]; then
- echo "Error: You miss 'dev-util/android-tool'" >&2
- exit 0
+# Gentoo
+
+#if ! [ -x "$(command -v adb)" ]; then
+ # echo "Error: You miss 'dev-util/android-tool'" >&2
+ #exit 0
+#fi
+
+if [[ `lsb_release -rs` == "ubuntu" ]]
+then
+  echo "Error: You miss 'adb'" >&2
 fi
 
 if [ "$1" == "--help" ] ; then
@@ -79,7 +101,6 @@ echo -e $r"(_______________)                                                  "$
 echo
 echo -e $r"-------------------------------------------------------------------\n"$e
 
-
 OPTION='Please enter your choice from below list: '
 options=("Start adb-server"
          "Kill adb-server"
@@ -87,8 +108,38 @@ options=("Start adb-server"
          "Enter shell"
          "Restart USB mode"
          "Restart WIFI mode"
+         "Connect to my device by wifi"
+         "View wifi passwords stored on device"
+         "Show my Android version"
+         "Copy files from your computer to your phone"
+         "Copy files from your phone to your computer"
+         "Install application"
+         "Uninstall application from device"
+         "Update application already excist on my device"
+         "Make a call"
+         "Open default sms application on phone screen"
+         "Open default sms application on phone screen"
+         "Reset permissions"
+         "Emulate wm device"
+         "Reset wm to default"
+         "Print text"
+         "Screenshot"
+         "Screenrecord"
+         "Key Event"
+         "ShPref"
+         "Add a value to default shared preferences."
+         "Remove a value to default shared preferences."
+         "Clear all default shared preferences."
+         "Its also possible to specify shared preferences file."
+         "Data types"
+         "Restart application process after making changes"
+         "Restore a backup to your phone."
+         "Push and flash custom ROMs and zips from your computer."
+         "Check connection and get basic information about devices connected to the computer."
+         ""
          ""
          "Quit")
+
 select opt in "${options[@]}"
 do
     case $opt in
@@ -214,8 +265,240 @@ exit 0
                       adb usb
                       ;;
 
-                      "Restart WIFI mode")
+                      "Restart WIFI  mode")
                       adb wifi
                       ;;
+
+                       "View wifi passwords stored on device")
+                      echo -e  "\n----- W I F I - P W D S -----\n"
+                      adb shell 'su -c cat /data/misc/wifi/wpa_supplicant.conf' | \
+                      while read -r line; do echo; echo -e "$line"; done | \
+                      grep 'psk' | tr -d 'psk=' | tr -d '"' 
+                      echo -e "\n-----------------------------"
+                       ;;
+
+                      "Connect to my device by wifi")
+                       read -p "Device ip: " ip
+                       read -p "Device port: " port
+                       adb connect $ip:$port
+                       ;;
+
+          "Show current Android version")
+          echo -e "\nCurrent android version:"
+          adb shell getprop ro.build.version.release 
+          echo ""
+          ;;
+
+
+#### COPY FILES FROM TO YOUR PHONE
+         "Copy files from your computer to your phone")
+           read -p "Source file to send: " source_file
+           read -p "Folder to place $source_file: " destination
+           adb push $source_file $destination
+                     echo ""
+          ;;
+
+#### COPY FILES FROM PHONE TO COMPUTER
+         "Copy files from your phone to your computer")
+          read -p "Source file you want transfer to your computer: " android_source_file
+          read -p "Where to store it on your computer: " pc_source
+          adb pull $android_source_file $pc_source
+          echo ""
+          ;;
+
+##### INSTALL APK APPLICATION         
+         "Install application")
+          "Enter folder to your .apk file: " apk_file
+          adb -e install $apk_file
+          echo ""
+          ;;          
+
+##### UNINSTALL APK APPLICATION
+          "Uninstall application from device") # (NOTDONE)
+           adb uninstall com.myAppPackage
+        #  adb uninstall <app .apk name>
+           adb uninstall -k <app .apk name> -> "Uninstall .apk withour deleting data"
+           adb devices | tail -n +2 | cut -sf 1 | xargs -IX adb -s X uninstall com.myAppPackage # //Uninstall the given app from all connected devices
+
+          echo ""
+          ;;
+
+
+##### UPDATE ALREADY EXCISTING DEVICE
+          "Update application already excist on my device") # (NOTDONE)
+          adb install -r yourApp.apk  # //  -r means re-install the app and keep its data on the device.
+          # adb install –k <.apk file path on computer> 
+          echo ""
+          ;;
+
+          "Press home button")
+           echo -e "Pressing home button for you"
+           adb shell am start -W -c android.intent.category.HOME -a android.intent.action.MAIN
+
+          echo ""
+          ;;
+
+##### CALL SOMEONE
+          "Make a call")
+           read -p "Enter the number you wanna call: +46" number
+          adb shell am start -a android.intent.action.CALL -d tel:46+$number // Make a call
+          echo ""
+          ;;
+
+          # SEND SMS
+          "Open default sms application on phone screen")
+           adb shell am start -a android.intent.action.SENDTO -d sms:+46700183309 --es sms_body "hej" --ez exit_on_sent true
+           sleep 1; adb shell input keyevent 22; sleep 1; adb shell input keyevent 66
+           echo ""
+          ;;
+
+##### RESET PERMISSION
+          "Reset permissions")
+          adb shell pm reset-permissions -p $1 
+          adb shell pm grant [$1] [ Permission] ## // Grant a permission to an app. 
+          adb shell pm revoke [$1] [ Permission] ##  // Revoke a permission from an app.
+          echo ""
+          ;;
+
+#### EMULATE WM DEVICE 
+         "Emulate wm device")
+           adb shell wm size 2048x1536
+           adb shell wm density 288
+          echo ""
+          ;;
+
+#### RESET WM DEVICE
+         "Reset wm to default")
+          adb shell wm size reset
+          adb shell wm density reset
+          echo ""
+          ;;
+
+#### PRINT SOME TEXT
+         "Print text")
+         adb shell input text 'Wow, it so cool feature'
+          echo ""
+          ;;
+
+#### TAKE A SIMPLE SCREENSHOT
+          Screenshot)
+          if [ `adb shell "if [ -e /sdcard/wuzedroid ]; then echo 1; fi"` ]; then 
+          echo "";
+          else
+          echo "Seems /sdcard/wuzedroid/screenshots does not exist..."
+          adb shell mkdir /sdcard/wuzedroid;
+          echo "Sucessfully created /sdcard/wuzedroid/screenshots"
+          fi
+
+          echo "Reading /etc/wuzedroid/wuzedroid.conf...." >&2
+          source /etc/wuzedroid/wuzedroid.conf
+          read -p "Name of your screenshot? " name
+          adb shell screencap -p $screenshot_path/$name.png
+          echo -e "Sucessfully toke a screenshot\nScreenhot has been saved in $screenshot_path/$name.png\n" >&2
+          ;;
+
+#### SCREENRECORD
+         "Screenrecord")
+          adb shell screenrecord /sdcard/NotAbleToLogin.mp4
+          #shell@ $ screenrecord --verbose /sdcard/demo.mp4
+          #(press Control + C to stop)
+          #shell@ $ exit
+          #$ adb pull /sdcard/demo.mp4
+          echo ""
+          ;;
+
+#### KEY EVENTS
+         "Key Event")
+           adb shell input keyevent 3    # // Home btn
+           adb shell input keyevent 4    # // Back btn
+           adb shell input keyevent 5    # // Call
+           adb shell input keyevent 6    # // End call
+           adb shell input keyevent 26   # // Turn Android device ON and OFF. It will toggle device to on/off status.
+           adb shell input keyevent 27   # // Camera
+           adb shell input keyevent 64   # // Open browser
+           adb shell input keyevent 66   # // Enter
+           adb shell input keyevent 67   # // Delete (backspace)
+           adb shell input keyevent 207  # // Contacts
+           adb shell input keyevent 221  # // Brightness down/up
+
+           ## // https://developer.android.com/reference/android/view/KeyEvent.html
+          echo ""
+          ;;
+
+          "ShPref")
+
+          echo ""
+          ;;
+
+#### Add a value to default shared preferences
+         "Add a value to default shared preferences")
+         #  adb shell 'am broadcast -a org.example.app.sp.PUT --es key key_name --es value "hello world!"'
+          echo ""
+          ;;
+
+#### Remove a value to default shared preferences
+         "Remove a value to default shared preferences")
+          adb shell 'am broadcast -a org.example.app.sp.REMOVE --es key key_name'
+          echo ""
+          ;;
+
+#### Clear all default shared preferences
+          "Clear all default shared preferences")
+           adb shell 'am broadcast -a org.example.app.sp.CLEAR --es key key_name'
+          echo ""
+          ;;
+
+#### Its also possible to specify shared preferences file
+         "Its also possible to specify shared preferences file")
+           adb shell 'am broadcast -a org.example.app.sp.PUT --es name Game --es key level --ei value 10'
+          echo ""
+          ;;
+
+#### DATA TYPES
+         "Data types")
+          adb shell 'am broadcast -a org.example.app.sp.PUT --es key string --es value "hello world!"'
+          adb shell 'am broadcast -a org.example.app.sp.PUT --es key boolean --ez value true'
+          adb shell 'am broadcast -a org.example.app.sp.PUT --es key float --ef value 3.14159'
+          adb shell 'am broadcast -a org.example.app.sp.PUT --es key int --ei value 2015'
+          adb shell 'am broadcast -a org.example.app.sp.PUT --es key long --el value 9223372036854775807'
+          echo ""
+          ;;
+
+#### Restart application process after making change
+          "Restart application process after making change")
+           adb shell 'am broadcast -a org.example.app.sp.CLEAR --ez restart true'
+          echo ""
+          ;;
+
+##### MONKEYU
+         "Monkey")
+           adb shell monkey -p com.myAppPackage -v 10000 -s 100 // monkey tool is generating 10.000 random events on the real device
+          echo ""
+          ;;
+
+#### RESTORE PHONE FROM A BACKUP
+         "Restore a backup to your phone")
+           adb backup // Create a full backup of your phone and save to the computer.
+           adb restore // Restore a backup to your phone.
+           adb sideload //  Push and flash custom ROMs and zips from your computer.
+          echo ""
+          ;;
+
+         "Push and flash custom ROMs and zips from your computer.")
+           adb
+          echo ""
+          ;;
+          "Check connection and get basic information about devices connected to the computer")
+           adb
+          echo ""
+          ;;
+
+#### QUIT
+
+        "Quit")
+            break
+            ;;
+        *) echo "Sorry, that value has not been added yet, 1-36 is your options..."
+        ;;
     esac
 done
